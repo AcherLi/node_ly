@@ -1,4 +1,4 @@
-const {telemarketing} = require('./config/dataConf')
+const {consultant} = require('./config/dataConf')
 const request = require('request'); 
 const dataList = require('./util/data.js');
 const cardData = require('./util/data2.js');
@@ -10,7 +10,7 @@ var args = process.argv.splice(2)
 
 let index = Number(args[0]) || 0
 
-async function login(v) {
+function login(v) {
   return new Promise((resolve, reject) => {
     request({
       url: 'http://lefangtong.net:6374/account/login', //请求路径
@@ -37,10 +37,10 @@ async function login(v) {
 }
 
 // 获得全局变量
-async function getIndex(cookie) {
+function getIndex(cookie) {
   return new Promise((resolve, reject) => {
     request({
-      url: 'http://lefangtong.net:6374/dx', //请求路径
+      url: 'http://lefangtong.net:6374/khgj', //请求路径
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36",
         "X-Requested-With": "XMLHttpRequest",
@@ -56,8 +56,76 @@ async function getIndex(cookie) {
   })
 }
 
+// 所有楼栋号
+function getLD(user, cookie, FORMHASH, sessionkey, citycode) {
+  return new Promise((resolve, reject) => {
+    request({
+      url: 'http://lefangtong.net:6374/fy/get_loudong', //请求路径
+      method: "POST", //请求方式，默认为get
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36",
+        "X-Requested-With": "XMLHttpRequest",
+        "Cookie": cookie
+      },
+      formData: {
+        'iid': user.itemorgid,
+        'FORMHASH': FORMHASH,
+        'uid': user.uid,
+        'sessionkey': sessionkey,
+        'citycode': citycode
+      }
+    }, function(error, response, body) {
+      if (!error && response.statusCode == 200) {
+        let data = JSON.parse(body).result.loudonglist
+        resolve(data[data.length - 1].id)
+      } else {
+        reject(error)
+      }
+    }); 
+  })
+}
+
+// 获得楼层单位
+function getldstruct(user, cookie, FORMHASH, sessionkey, citycode, ldid) {
+  return new Promise((resolve, reject) => {
+    request({
+      url: 'http://lefangtong.net:6374/item/getldstruct', //请求路径
+      method: "POST", //请求方式，默认为get
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36",
+        "X-Requested-With": "XMLHttpRequest",
+        "Cookie": cookie
+      },
+      formData: {
+        'iid': user.itemorgid,
+        'siid': 0,
+        'ldid': ldid,
+        'from': 1,
+        'FORMHASH': FORMHASH,
+        'uid': user.uid,
+        'sessionkey': sessionkey,
+        'citycode': citycode
+      }
+    }, function(error, response, body) {
+      if (!error && response.statusCode == 200) {
+        let data = JSON.parse(body).result.units
+        let arr = []
+        for (let key in data) {
+          arr.push(data[key])
+        }
+        arr = arr.filter(v => v.sellstate == '1')
+        resolve(arr)
+      } else {
+        reject(error)
+      }
+    }); 
+  })
+}
+
 // 客户录入
-async function addkh(user, cookie, FORMHASH, sessionkey, citycode) {
+function addkh(user, cookie, FORMHASH, sessionkey, citycode, fzData) {
+  let fz = Math.floor(Math.random() * fzData.length);
+  let gj_type = Math.floor(Math.random() * 2 + 1)
   return new Promise((resolve, reject) => {
     request({
       url: 'http://lefangtong.net:6374/khgj/addkh', //请求路径
@@ -90,7 +158,7 @@ async function addkh(user, cookie, FORMHASH, sessionkey, citycode) {
         'zhuangxiu_id': Math.floor(Math.random() * 2 + 1),
         'need_lc': randomArr([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]),
         'need_dw': randomArr([1,2,3,4]),
-        'huxing': randomArr([1,2,3,45,6]),
+        'huxing': randomArr([1,2,3,4,5,6]),
         'ask_point': randomArr([21,22,23,24,25,26,27,28,29,210,211,212,213,214,215,2164]),
         'kh_laiyuan_value': randomArr([31,3,33,34,35,36,37,38,39,310,311,313,313]),
         'wtr_id': 0,
@@ -102,15 +170,13 @@ async function addkh(user, cookie, FORMHASH, sessionkey, citycode) {
         'gf_yiyuan': Math.floor(Math.random() * 3 + 1),
         'gf_ability': Math.floor(Math.random() * 3 + 1),
         'kh_status': Math.floor(Math.random() * 2 + 1),
-        'yixiang_i': 3118620916958239,
-        'yixiang_ii': '',
-        'yixiang_iii': '',
-        'gj_type': Math.floor(Math.random() * 2 + 1),
-        'df_num': 0, //到访次数和来访有关系
+        'yixiang_i': fzData[fz].id,
+        'yixiang_ii': fzData[(fz + 1) % fzData.length].id,
+        'yixiang_iii': fzData[(fz + 2) % fzData.length].id,
+        'gj_type': gj_type,
+        'df_num': gj_type % 1, //到访次数和来访有关系
+        'stay_time_id': Math.floor(Math.random() * 6 + 1),
         'gj_content': '',
-        'rcArr[]': '',
-        // 'lat': 31.72738408495587,
-        // 'lng': 117.11826954832136,
         'uid': user.uid,
         'FORMHASH': FORMHASH,
         'sessionkey': sessionkey,
@@ -118,6 +184,7 @@ async function addkh(user, cookie, FORMHASH, sessionkey, citycode) {
       }
     }, function(error, response, body) {
       if (!error && response.statusCode == 200) {
+
         resolve(body)
       } else {
         reject(error)
@@ -126,7 +193,7 @@ async function addkh(user, cookie, FORMHASH, sessionkey, citycode) {
   })
 }
 
-telemarketing.forEach(async function (v) {
+consultant.forEach(async function (v) {
   await login(v).then(async function (cookie) {
     await getIndex(cookie).then(async function (res) {
       let $ = cheerio.load(res);
@@ -136,13 +203,17 @@ telemarketing.forEach(async function (v) {
       let FORMHASH = $_FORMHASH
       let sessionkey = $_sessionkey
       let citycode = $_C.citycode
-      for(let i = 0; i < v.count; i++) {
-        await addkh(user, cookie, FORMHASH, sessionkey, citycode).then(res => {
-          console.log(index)
-          console.log(`${user.username}录入${dataList[index].name}成功`)
-          index ++
+      await getLD(user, cookie, FORMHASH, sessionkey, citycode).then(async function (llid) {
+        await getldstruct(user, cookie, FORMHASH, sessionkey, citycode, llid).then(async function (fzData) {
+          for(let i = 0; i < count; i++) {
+            await addkh(user, cookie, FORMHASH, sessionkey, citycode, fzData).then(res => {
+              console.log(index)
+              console.log(`${user.username}录入${dataList[index].name}成功`)
+              index ++
+            })
+          }
         })
-      }
+      })
     })
   })
 })
