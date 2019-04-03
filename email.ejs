@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+    </title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+</head>
+
+<body style="margin:0;padding:0;">
+    <p>今日操作记录   <%= todaystr %></p>
+    <% for(var j = 0; j < data.length; j++) { %>
+        <div>
+            <p><%= data[j].res %></p>
+            <p><%= data[j].data %></p>
+        </div>
+    <% } %>
+</body>
+</html>

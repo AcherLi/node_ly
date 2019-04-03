@@ -5,7 +5,7 @@ function randomArr(arr) {
   if (newStr && newStr.length) {
     return newStr.join(',');
   } else {
-    let index = Math.floor(Math.random() * arr.length + 1)
+    let index = Math.floor(Math.random() * arr.length)
     return arr[index];
   }
 }
