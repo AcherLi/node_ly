@@ -102,6 +102,7 @@ async function addgj(user, cookie, FORMHASH, sessionkey, citycode) {
 }
 
 async function init() {
+  logs = []
   await readFile();
   for (let i = 0; i < telemarketing.length; i++) {
     let v = telemarketing[i]

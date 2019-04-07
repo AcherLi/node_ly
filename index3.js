@@ -182,6 +182,7 @@ function addkh(user, cookie, FORMHASH, sessionkey, citycode, detail) {
 }
 
 async function init() {
+  logs = []
   for (let i = 0; i < consultant.length; i++) {
     let v = consultant[i]
     await login(v).then(async function (cookie) {

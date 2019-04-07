@@ -209,6 +209,7 @@ function addkh(user, cookie, FORMHASH, sessionkey, citycode, fzData) {
 }
 
 async function init() {
+  logs = []
   await readFile();
   for (let i = 0; i < consultant.length; i++) {
     let v = consultant[i]
