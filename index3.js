@@ -163,7 +163,8 @@ function addkh(user, cookie, FORMHASH, sessionkey, citycode, detail) {
         'yixiang_iii': detail.yixiang_iii,
         'gj_type': detail.gj_type,
         'df_num': Number(detail.df_num) + gj_type % 1, //到访次数和来访有关系
-        'stay_time_id': Math.floor(Math.random() * 6 + 1),
+        'stay_time': Math.floor(Math.random() * 360 + 5),
+        'stay_time_select': 1,
         'uid': user.uid,
         'FORMHASH': FORMHASH,
         'sessionkey': sessionkey,
