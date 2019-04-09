@@ -45,6 +45,31 @@ const consultant = [{
   password: '123456',
   count: 4,
   scount: 3
+}, {
+  username: '王钦',
+  password: '123456',
+  count: 7,
+  scount: 3
+}, {
+  username: '陈乾',
+  password: '123456',
+  count: 3,
+  scount: 1
+}, {
+  username: '赵志林',
+  password: '123456',
+  count: 4,
+  scount: 1
+}, {
+  username: '刘灿',
+  password: '123456',
+  count: 3,
+  scount: 1
+}, {
+  username: '金聪熙',
+  password: '123456',
+  count: 3,
+  scount: 1
 }]
 
 module.exports = {

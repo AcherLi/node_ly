@@ -3,7 +3,7 @@ const request = require('request');
 const dataList = require('./util/data.js');
 const cheerio = require("cheerio"); //能够像Jquery一样方便获取DOM节点
 
-let logs = []
+let logs = [];
 
 function login(v) {
   return new Promise((resolve, reject) => {
@@ -21,7 +21,7 @@ function login(v) {
         checkcode: '',
       }
     }, function (error, response, body) {
-      if (!error && response.statusCode == 200) {
+      if (!error && response.statusCode === 200) {
         let data = response.caseless.dict['set-cookie'][0].split(";")[0]
         resolve(data)
       } else {
